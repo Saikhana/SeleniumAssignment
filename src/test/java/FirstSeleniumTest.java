@@ -12,73 +12,46 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import java.util.*;  
 
-public class FirstSelenium {
 
-    private WebDriver driver;
-    private WebDriverWait wait;
-
+public class FirstSeleniumTest {
+    public WebDriver driver;
+    
     @Before
     public void setup() {
         WebDriverManager.chromedriver().setup();
 
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        wait = new WebDriverWait(driver, 10);
     }
-
-    private final By bodyLocator = By.tagName("body");
-    private final By implementPasswordLocator = By.id("login-with-epic");
-    private final By implementLoginLocator = By.id("sign-in");
-    private final By emailToggler=By.id("email");
-    private final By passwordToggler=By.id("password");
-    private final By BodyCheck = By.tagName("body");
-    private final By LogOutLocator = By.id("log-out");
-
-
+    
     @Test
-    public void multiplicationTest() {
-        this.driver.get("https://www.epicgames.com/id/login?lang=en-US&noHostRedirect=true&redirectUrl=https%3A%2F%2Fstore.epicgames.com%2Fen-US%2F&client_id=875a3b57d3a640a6b7f9b4e883463ab4");
-
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(bodyLocator));
-        WebElement resultElement = this.driver.findElement(bodyLocator);
-        System.out.println(resultElement.getText());
-
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(implementPasswordLocator));
-        WebElement searchTogglerElement = this.driver.findElement(implementPasswordLocator);
-        searchTogglerElement.click();
-
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(emailToggler));
-        WebElement emailTogglerElement = this.driver.findElement(emailToggler);
-        emailTogglerElement.sendKeys("bimaxa5128@bunlets.com \n");
-        
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(passwordToggler));
-        WebElement passwordTogglerElement = this.driver.findElement(passwordToggler);
-        passwordTogglerElement.sendKeys("Hungary1234 \n");
-
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(implementLoginLocator));
-        WebElement loginTogglerElement = this.driver.findElement(implementLoginLocator);
-        loginTogglerElement.click();
-
-        // this.wait.until(ExpectedConditions.visibilityOfElementLocated(BodyCheck));
-        // WebElement bodyText = this.driver.findElement(BodyCheck);
-        // Assert.assertTrue(bodyText.getText());
-
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(BodyCheck));
-        //Get page title
-        String actualGooglePageTitlte=driver.getTitle();
-        System.out.println("Page title" + actualGooglePageTitlte);  
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(BodyCheck));
-        
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(LogOutLocator));
-        WebElement LogOutLocatorElement = this.driver.findElement(LogOutLocator);
-        searchTogglerElement.click();
-
+    public void testSearch() {
+        MainPage mainPage = new MainPage(this.driver);
+        Assert.assertTrue(mainPage.getFooterText().contains("2022, Epic Games, Inc"));
+               
+        SearchResultPage searchResultPage = mainPage.search("Magic: The Gathering Arena");
+        String bodyText = searchResultPage.getBodyText();
+        Assert.assertTrue(bodyText.contains("Magic: The Gathering Arena"));
+        Assert.assertTrue(bodyText.contains("For Students"));
     }
-        @After
+    
+    @Test
+    public void testSearch2() {
+        String[] searchQueries={"Magic: The Gathering Arena"};  
+        for(String searchQuery : searchQueries) {  
+            MainPage mainPage = new MainPage(this.driver);
+            SearchResultPage searchResultPage = mainPage.search(searchQuery);
+            String bodyText = searchResultPage.getBodyText();
+            Assert.assertTrue(bodyText.contains("Magic: The Gathering Arena"));
+        }  
+    }
+    
+
+    
+    @After
     public void close() {
         if (driver != null) {
             driver.quit();
         }
     }
-
 }
